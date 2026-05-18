@@ -1,0 +1,69 @@
+@import "tailwindcss";
+
+:root {
+  --accent: #ea580c;
+  --accent-hover: #c2410c;
+  --bg-page: #fbf7f1;
+  --bg-card: #ffffff;
+  --border-warm: #ece5d8;
+}
+
+html {
+  font-size: 17.5px;
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg-page);
+  font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-feature-settings: "ss01", "cv11", "tnum";
+}
+
+::selection {
+  background: rgba(234, 88, 12, 0.2);
+  color: #431407;
+}
+
+.nav-underline {
+  position: relative;
+}
+.nav-underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  height: 2px;
+  width: 100%;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 200ms ease;
+}
+.nav-underline:hover::after,
+.nav-underline:focus-visible::after {
+  transform: scaleX(1);
+}
+
+.grid-card {
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+.grid-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(234, 88, 12, 0.45);
+  box-shadow: 0 6px 24px -16px rgba(234, 88, 12, 0.35);
+}
+
+.expand-enter {
+  overflow: hidden;
+  animation: expand 220ms ease both;
+}
+@keyframes expand {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
