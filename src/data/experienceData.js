@@ -20,7 +20,7 @@ const experienceData = [
     ],
   },
   {
-    role: 'Lead Research Analyst',
+    role: 'Research Analyst',
     organisation: 'LENSELL',
     project: 'Financial Service',
     period: 'August 2025 – November 2025',

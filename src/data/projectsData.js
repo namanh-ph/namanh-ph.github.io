@@ -166,7 +166,7 @@ const projectsData = [
     features: [
       'E-Commerce Online Retail Analysis: RFM analysis with K-Means and hierarchical clustering to group customers into 6 lifecycle segments.',
       '8-Week SQL Challenge: 8 SQL challenges covering multiple case studies.',
-      'Company Valuation - DCF Analysis: Valuation of REA Group using DuPont analysis, bottom-up beta, CAPM-based WACC, sensitivity testing, plus a yfinance pipeline of multiple companies.',
+      'Company Valuation - DCF Analysis: Valuation of a listed Australian company using DuPont analysis, bottom-up beta, CAPM-based WACC, sensitivity testing, and stress-test it against multiple scenarios.',
       'Portfolio Optimisation with Monte Carlo: portfolio analysis using CAPM, risk-return metrics, correlation review, and random-weight simulation for Sharpe-optimal allocation.',
       'Business Case: ChemCorp Incorporated: Tableau case study on customer mix, market position, product profitability, and divestment recommendations.',
       'Business Case: American Energy Market Regulator: SQL and Tableau analysis of US power outages, focused on outage frequency, duration, energy loss, and provider reliability scoring.',
