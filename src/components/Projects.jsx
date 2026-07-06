@@ -1,5 +1,11 @@
 import { Fragment, useEffect, useMemo, useState } from 'react'
-import { FiGithub, FiChevronDown } from 'react-icons/fi'
+import {
+  FiChevronDown,
+  FiChevronLeft,
+  FiChevronRight,
+  FiGithub,
+  FiX,
+} from 'react-icons/fi'
 import projectsData from '../data/projectsData'
 
 const ALL = 'All'
@@ -23,6 +29,8 @@ function useGridCols() {
 export default function Projects() {
   const [filter, setFilter] = useState(ALL)
   const [expanded, setExpanded] = useState(null)
+  const [galleryIndex, setGalleryIndex] = useState(0)
+  const [lightboxIndex, setLightboxIndex] = useState(null)
   const cols = useGridCols()
 
   const categories = useMemo(() => {
@@ -49,6 +57,41 @@ export default function Projects() {
   const expandedRow = expandedIndex >= 0 ? Math.floor(expandedIndex / cols) : -1
   const expandedProject =
     expandedIndex >= 0 ? visible[expandedIndex] : null
+  const gallery = expandedProject?.gallery ?? []
+  const lightboxImage =
+    lightboxIndex === null ? null : gallery[lightboxIndex] ?? null
+
+  useEffect(() => {
+    setGalleryIndex(0)
+    setLightboxIndex(null)
+  }, [expanded])
+
+  useEffect(() => {
+    if (!lightboxImage) return undefined
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        setLightboxIndex(null)
+      } else if (event.key === 'ArrowLeft' && gallery.length > 1) {
+        const nextIndex =
+          (lightboxIndex - 1 + gallery.length) % gallery.length
+        setLightboxIndex(nextIndex)
+        setGalleryIndex(nextIndex)
+      } else if (event.key === 'ArrowRight' && gallery.length > 1) {
+        const nextIndex = (lightboxIndex + 1) % gallery.length
+        setLightboxIndex(nextIndex)
+        setGalleryIndex(nextIndex)
+      }
+    }
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.body.style.overflow = previousOverflow
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [gallery.length, lightboxImage, lightboxIndex])
 
   return (
     <section
@@ -208,6 +251,74 @@ export default function Projects() {
                       </div>
 
                       <div className="space-y-6">
+                        {gallery.length > 0 && (
+                          <div>
+                            <h4 className="text-[13px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                              Gallery
+                            </h4>
+                            <div className="mt-3 overflow-hidden rounded-xl border border-[#ece5d8] bg-[#fbf7f1]">
+                              <div className="relative">
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setLightboxIndex(galleryIndex)
+                                  }
+                                  className="group block aspect-video w-full overflow-hidden bg-[#fbf7f1]"
+                                  aria-label={`Enlarge ${gallery[galleryIndex].caption}`}
+                                >
+                                  <img
+                                    src={gallery[galleryIndex].src}
+                                    alt={gallery[galleryIndex].alt}
+                                    className="h-full w-full object-contain"
+                                  />
+                                  <span className="absolute inset-0 flex items-center justify-center bg-slate-950/60 px-4 text-center text-sm font-semibold text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
+                                    View details
+                                  </span>
+                                </button>
+
+                                {gallery.length > 1 && (
+                                  <>
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        setGalleryIndex(
+                                          (galleryIndex - 1 + gallery.length) %
+                                            gallery.length,
+                                        )
+                                      }
+                                      aria-label="Previous image"
+                                      className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-1.5 text-slate-700 shadow hover:bg-white hover:text-orange-600"
+                                    >
+                                      <FiChevronLeft size={17} />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        setGalleryIndex(
+                                          (galleryIndex + 1) % gallery.length,
+                                        )
+                                      }
+                                      aria-label="Next image"
+                                      className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-1.5 text-slate-700 shadow hover:bg-white hover:text-orange-600"
+                                    >
+                                      <FiChevronRight size={17} />
+                                    </button>
+                                  </>
+                                )}
+                              </div>
+
+                              <div className="flex items-center justify-between gap-3 px-3 py-2.5">
+                                <p className="truncate text-xs font-medium text-slate-700">
+                                  {gallery[galleryIndex].caption}
+                                </p>
+                                <span className="shrink-0 text-[11px] tabular-nums text-slate-500">
+                                  {galleryIndex + 1} / {gallery.length}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
                         <div>
                           <h4 className="text-[13px] font-semibold uppercase tracking-[0.16em] text-slate-500">
                             Stack
@@ -241,6 +352,69 @@ export default function Projects() {
           })}
         </div>
       </div>
+
+      {lightboxImage && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={lightboxImage.caption}
+          onClick={() => setLightboxIndex(null)}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 p-4 md:p-10"
+        >
+          <button
+            type="button"
+            onClick={() => setLightboxIndex(null)}
+            aria-label="Close enlarged image"
+            className="absolute right-4 top-4 rounded-full bg-white/10 p-2 text-white hover:bg-white/20"
+          >
+            <FiX size={24} />
+          </button>
+          {gallery.length > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.stopPropagation()
+                  const nextIndex =
+                    (lightboxIndex - 1 + gallery.length) % gallery.length
+                  setLightboxIndex(nextIndex)
+                  setGalleryIndex(nextIndex)
+                }}
+                aria-label="Previous enlarged image"
+                className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-2.5 text-white hover:bg-white/20 md:left-6"
+              >
+                <FiChevronLeft size={28} />
+              </button>
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.stopPropagation()
+                  const nextIndex = (lightboxIndex + 1) % gallery.length
+                  setLightboxIndex(nextIndex)
+                  setGalleryIndex(nextIndex)
+                }}
+                aria-label="Next enlarged image"
+                className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-2.5 text-white hover:bg-white/20 md:right-6"
+              >
+                <FiChevronRight size={28} />
+              </button>
+            </>
+          )}
+          <figure
+            onClick={(event) => event.stopPropagation()}
+            className="flex max-h-full max-w-7xl flex-col items-center gap-3"
+          >
+            <img
+              src={lightboxImage.src}
+              alt={lightboxImage.alt}
+              className="max-h-[82vh] max-w-full rounded-lg bg-white object-contain shadow-2xl"
+            />
+            <figcaption className="text-sm font-medium text-white">
+              {lightboxImage.caption}
+            </figcaption>
+          </figure>
+        </div>
+      )}
     </section>
   )
 }
